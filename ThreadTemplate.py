@@ -2,13 +2,13 @@
 
 __author__ = 'g9752'
 
-import wx
-import PIL
-import Image
+#import wx
+#import PIL
+#import Image
+#import numpy as np
+#import matplotlib.pyplot as plt
 import struct
 from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
 from wx.lib.pubsub import pub as Publisher
 import threading
 
@@ -24,7 +24,7 @@ class Encrypt_Thread(threading.Thread):
         self.Encrypt(self.src,self.dst,self.tofile)
         pass
 
-    def bit2list(self,byte):
+    def byte2list(self,byte):
         """
         将一个byte值转换成长度为8的字符列表，列表元素类型为 char
         :param byte: byte值
@@ -49,7 +49,7 @@ class Encrypt_Thread(threading.Thread):
         bitlist = []
         byte = fp.read(1)
         while byte != "":
-            bitlist += self.bit2list(byte)
+            bitlist += self.byte2list(byte)
             byte = fp.read(1)
         fp.close()
         return bitlist
@@ -63,7 +63,7 @@ class Encrypt_Thread(threading.Thread):
         """
         for i in range(len(flag)):
             #byte = struct.unpack("b",flag[i])
-            bitlist += self.bit2list(flag[i])
+            bitlist += self.byte2list(flag[i])
         return bitlist
 
 
@@ -139,7 +139,7 @@ class DeLSB_Thread(threading.Thread):
         except Exception:
             print lb
 
-    def bit2list(self,byte):
+    def byte2list(self,byte):
         """
         将一个byte值转换成长度为8的字符列表，列表元素类型为 char
         :param byte: byte值
@@ -188,7 +188,7 @@ class DeLSB_Thread(threading.Thread):
         flag = "LSB"
         flag_l = []
         for i in range(len(flag)):
-            flag_l += self.bit2list(flag[i])
+            flag_l += self.byte2list(flag[i])
         flag_l = map(int,flag_l)
 
         while len(bytelist) != 0:

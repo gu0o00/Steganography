@@ -3,15 +3,15 @@ __author__ = 'g9752'
 
 import wx
 import os
-from LSB_R import LSB
-from LSB_R import deLSB
+#from LSB_R import LSB
+#from LSB_R import deLSB
 from wx.lib.pubsub import pub as Publisher
 import LSB_PM1_Thread
 
 class StegTab3(wx.Panel):
     """
-    这里用来填充第一种隐写的功能:
-    在文件的尾部直接追加，即“图种”的方式
+    这里用来填充第三种隐写的功能:
+    通过LSB-PM1算法实现信息隐藏
     """
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)

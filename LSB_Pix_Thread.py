@@ -2,15 +2,16 @@
 
 __author__ = 'g9752'
 
-import wx
-import PIL
-import Image
+#import wx
+#import PIL
+#import Image
+#import numpy as np
+#import matplotlib.pyplot as plt
 import struct
 from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
 from wx.lib.pubsub import pub as Publisher
 import threading
+import time
 
 masklist = [0b11111110,
             0b11111100,
@@ -30,7 +31,10 @@ class LSB_Pix_Thread(threading.Thread):
         pass
 
     def run(self):
+        starttime = time.clock()
         self.Encrypt(self.src,self.dst,self.tofile,self.level)
+        endtime = time.clock()
+        print "encrypt use time:", endtime-starttime
         pass
 
     def Encrypt(self,src,dst,tofile,level):
@@ -44,7 +48,7 @@ class LSB_Pix_Thread(threading.Thread):
         """
         src_im = Image.open(src).convert("RGB")
         dst_im = Image.open(dst).convert("RGB")
-
+        level = level - 1
         #统一原图与隐写图的图像大小
         dst_im = dst_im.resize(src_im.size,Image.ANTIALIAS)
 
@@ -77,8 +81,8 @@ class LSB_Pix_Thread(threading.Thread):
                 process = (i) * height + j
                 process = float(process) * 100 / (width * height)
                 Publisher.sendMessage("updateGauge_pix",message=process)
-        Publisher.sendMessage("updateGauge_pix",message=100)
         dst_im.save(tofile)
+        Publisher.sendMessage("updateGauge_pix",message=100)
         print "save file"
 
         return (True,u"成功完成LSB算法")
@@ -91,7 +95,11 @@ class DeLSB_Thread(threading.Thread):
         self.level = level
 
     def run(self):
+        starttime = time.clock()
         self.Decrypt(self.src,self.tofile,self.level)
+        endtime = time.clock()
+        print "decrypt use time:", endtime-starttime
+        pass
 
     def Decrypt(self,src,tofile,level):
         """
@@ -102,7 +110,7 @@ class DeLSB_Thread(threading.Thread):
         :return:结果元组
         """
         im = Image.open(src).convert("RGB")
-
+        level = level - 1
         width,height = im.size
         for i in range(width):
             for j in range(height):

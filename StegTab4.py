@@ -3,8 +3,8 @@ __author__ = 'g9752'
 
 import wx
 import os
-from LSB_R import LSB
-from LSB_R import deLSB
+#from LSB_R import LSB
+#from LSB_R import deLSB
 from wx.lib.pubsub import pub as Publisher
 import LSB_PM1_Thread
 import LSB_Pix_Thread
@@ -12,8 +12,8 @@ from PIL import Image
 
 class StegTab4(wx.Panel):
     """
-    这里用来填充第一种隐写的功能:
-    在文件的尾部直接追加，即“图种”的方式
+    这里用来填充第四种隐写的功能:
+    通过LSB水印的方式进行信息隐藏
     """
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
@@ -27,7 +27,7 @@ class StegTab4(wx.Panel):
         """
         添加一行标题内容，用来显示这部分使用的算法
         """
-        staticTitle = wx.StaticText(self,id=wx.ID_ANY,label=u"使用LSB-Pix的方法隐藏高位图像信息")
+        staticTitle = wx.StaticText(self,id=wx.ID_ANY,label=u"使用LSB水印的方法隐藏高位图像信息")
         font = wx.Font(20,wx.ROMAN,wx.SLANT,wx.BOLD)
         staticTitle.SetFont(font)
         staticTitle.SetForegroundColour(wx.RED)
@@ -69,7 +69,7 @@ class StegTab4(wx.Panel):
         创建 进度条 | 滑块 | 开始 清除  解密 按钮
         """
         self.gauge = wx.Gauge(self,id=wx.ID_ANY,range=100,size=(250,30))
-        self.slider = wx.Slider(self, wx.ID_ANY, 4, 1, 8, pos=(10, 10),
+        self.slider = wx.Slider(self, wx.ID_ANY, 4, 1, 7, pos=(10, 10),
                 size=(250, -1),
                 style=wx.SL_HORIZONTAL | wx.SL_AUTOTICKS | wx.SL_LABELS )
         self.slider.SetTickFreq(1)
@@ -218,6 +218,6 @@ class StegTab4(wx.Panel):
 
             self.Image.SetBitmap(wx.BitmapFromImage(img))
 
-            self.Refresh()
+            #self.Refresh()
             wx.MessageBox(u"成功",u"提示",wx.OK)
         pass

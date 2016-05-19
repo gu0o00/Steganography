@@ -2,16 +2,17 @@
 
 __author__ = 'g9752'
 
-import wx
-import PIL
-import Image
+#import wx
+#import PIL
+#import Image
+#import numpy as np
+#import matplotlib.pyplot as plt
 import struct
 from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
 from wx.lib.pubsub import pub as Publisher
 import threading
 import random
+import time
 
 class LSB_PM1_Thread(threading.Thread):
     def __init__(self,src,dst,tofile):
@@ -22,10 +23,13 @@ class LSB_PM1_Thread(threading.Thread):
         pass
 
     def run(self):
+        starttime = time.clock()
         self.Encrypt(self.src,self.dst,self.tofile)
+        endtime = time.clock()
+        print "encrypt use time:", endtime-starttime
         pass
 
-    def bit2list(self,byte):
+    def byte2list(self,byte):
         """
         将一个byte值转换成长度为8的字符列表，列表元素类型为 char
         :param byte: byte值
@@ -50,7 +54,7 @@ class LSB_PM1_Thread(threading.Thread):
         bitlist = []
         byte = fp.read(1)
         while byte != "":
-            bitlist += self.bit2list(byte)
+            bitlist += self.byte2list(byte)
             byte = fp.read(1)
         fp.close()
         return bitlist
@@ -64,7 +68,7 @@ class LSB_PM1_Thread(threading.Thread):
         """
         for i in range(len(flag)):
             #byte = struct.unpack("b",flag[i])
-            bitlist += self.bit2list(flag[i])
+            bitlist += self.byte2list(flag[i])
         return bitlist
 
 
@@ -80,6 +84,7 @@ class LSB_PM1_Thread(threading.Thread):
 
         bitlist = self.dstfile2list(dst)
         bitlist = self.AppendEndFlag(bitlist)    #向字节列表中追加结束标志
+        print 'bitlist length:',len(bitlist)
 
         ibitlist = 0
         try:
@@ -133,6 +138,13 @@ class LSB_PM1_Thread(threading.Thread):
                     rgb_im.putpixel((i,j),(r1,g1,b1))
                     #print (i,j),(r,g,b),(r1,g1,b1)
                     """
+                    提前完成加密操作
+                    """
+                    if ibitlist >= len(bitlist):
+                        rgb_im.save(tofile)
+                        Publisher.sendMessage("updateGauge_pm1",message=100)
+                        return (True,u"成功完成LSB算法")
+                    """
                     回送进度消息
                     """
                     process = (i) * height + j
@@ -154,7 +166,11 @@ class DeLSB_Thread(threading.Thread):
         self.tofile = tofile
 
     def run(self):
+        starttime = time.clock()
         self.Decrypt(self.src,self.tofile)
+        endtime = time.clock()
+        print "decrypt use time:", endtime-starttime
+        pass
 
     def list2byte(self,lb):
         """
@@ -175,7 +191,7 @@ class DeLSB_Thread(threading.Thread):
         except Exception:
             print lb
 
-    def bit2list(self,byte):
+    def byte2list(self,byte):
         """
         将一个byte值转换成长度为8的字符列表，列表元素类型为 char
         :param byte: byte值
@@ -232,7 +248,7 @@ class DeLSB_Thread(threading.Thread):
                 process = (i) * height + j
                 process = process * 50 / (width * height)
                 Publisher.sendMessage("updateGauge_pm1",message=process)
-        print len(bytelist)
+        print 'bitlist length: ',len(bytelist)
         len_list = len(bytelist)
         """
         获取flag的bit列表
@@ -240,7 +256,7 @@ class DeLSB_Thread(threading.Thread):
         flag = "LSB"
         flag_l = []
         for i in range(len(flag)):
-            flag_l += self.bit2list(flag[i])
+            flag_l += self.byte2list(flag[i])
         flag_l = map(int,flag_l)
 
         while len(bytelist) != 0:

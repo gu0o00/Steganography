@@ -25,7 +25,7 @@ class NotebookPanel(wx.Notebook):
         self.AddPage(tab3,u"LSB-PM1")
 
         tab4 = StegTab4(self)
-        self.AddPage(tab4,u"LSB-Pix图像信息隐藏")
+        self.AddPage(tab4,u"LSB水印")
 
         #tab5 = StegTab5(self)
         #self.AddPage(tab5,u"BPCS(位平面复杂度分割)")
@@ -40,7 +40,7 @@ class MainFrame(wx.Frame):
         """
         定位标签页的位置，方便编程
         """
-        notebook.SetSelection(3)
+        #notebook.SetSelection(3)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(notebook,1,wx.ALL|wx.EXPAND,5)
         panel.SetSizer(sizer)
