@@ -141,10 +141,10 @@ class StegTab4(wx.Panel):
 
     def ChooseSrcPic(self,event):
         #wx.MessageDialog(self,u"选择图片路径",u"提示",wx.OK).ShowModal()
-        wildcard = "All files (*.*)|*.*|" \
-                   "BMP files (.bmp)|*.bmp|" \
+        wildcard = "BMP files (.bmp)|*.bmp|" \
                    "PNG files (*.png)|*.png|" \
-                   "JPG files (*.jpg)|*.jpg"
+                   "JPG files (*.jpg)|*.jpg|" \
+                   "All files (*.*)|*.*"
 
         fileDialog = wx.FileDialog(self,u"选择源图片文件",os.getcwd(),"",wildcard,wx.FD_OPEN)
         if fileDialog.ShowModal() == wx.ID_OK:
@@ -174,6 +174,12 @@ class StegTab4(wx.Panel):
         src = self.txtPicPath.GetValue()
         dst = self.txtFilePath.GetValue()
         self.tofile = self.txtDstPath.GetValue()
+        if src.split('.')[-1] not in ["bmp","png","jpg"]:
+            wx.MessageBox(u"不支持源图片格式",u"错误")
+            return
+        if self.tofile.split('.')[-1] in ["jpg","jpeg","gif"]:
+            wx.MessageBox(u"不支持目的图片格式",u"错误")
+            return
 
         #result = LSB(src,dst,tofile,"")
         level = self.slider.GetValue()

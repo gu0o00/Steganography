@@ -154,7 +154,8 @@ class LSB_PM1_Thread(threading.Thread):
             rgb_im.save(tofile)
             Publisher.sendMessage("updateGauge_pm1",message=100)
             pass
-
+        except IOError,e:
+            return (False,e)
         finally:
             pass
         return (True,u"成功完成LSB算法")
