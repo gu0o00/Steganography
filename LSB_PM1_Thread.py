@@ -262,14 +262,23 @@ class DeLSB_Thread(threading.Thread):
 
         while len(bytelist) != 0:
             tmp = []
-            for t in range(8):
-                tmp.append(bytelist.pop(0))
+            i = 0
+            try:
+                while i < 8 and len(bytelist) != 0:
+                    tmp.append(bytelist.pop(0))
+                    i += 1
+            except IndexError:      #避免出现读到文件尾还没有出现结束标志（LSB）的情况
+                while len(tmp) < 8:
+                    tmp.insert(0,0) #高位补0
 
             """
             回送进度消息
             """
             process = ((len_list - len(bytelist)) * 50 / len_list) + 50
-            Publisher.sendMessage("updateGauge_pm1",message=process)
+            # 由于当100时，界面(StegTab3.py)要显示加密后（目的文件\tofile）图片，但此时解密后生成目的文件不是图片，
+            # 所以要避免message=100，此处进行或运算1,保证message为奇数，从而避免message=100
+            process = process | 1   
+            Publisher.sendMessage("updateGauge_pm1",message=process)    
 
             byte = self.list2byte(tmp)
             if byte == "L":
@@ -283,9 +292,7 @@ class DeLSB_Thread(threading.Thread):
 
             tofile.write(byte)
             tofile.flush()
-        tofile.close()
-        return (True,u"成功从图片中提取到隐写信息")
-        pass
+        return (True,u"成功从图片中提取到隐写信息，但是未遇到结尾标识，可能在加密时源文件大小不够")
 
 if __name__ == "__main__":
     pass
